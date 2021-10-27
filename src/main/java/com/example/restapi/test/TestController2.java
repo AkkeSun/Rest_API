@@ -8,6 +8,7 @@ public class TestController2 {
 
     @GetMapping("/test")
     public String test(){
+        System.out.println("TEST");
         return "test";
     }
 }
