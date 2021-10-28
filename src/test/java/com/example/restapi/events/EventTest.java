@@ -1,12 +1,11 @@
 package com.example.restapi.events;
 
+import com.example.restapi.common.BaseControllerTest;
 import org.junit.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
-public class EventTest {
+public class EventTest extends BaseControllerTest {
 
     @Test
     public void builder(){

@@ -11,7 +11,7 @@ public class ErrorsResource extends Resource<Errors> {
     public ErrorsResource(Errors content, Link... links) {
         super(content, links);
 
-        //method의 path로 이동하는 경우 이렇게 처리
+        // method의 path로 이동하는 경우 이렇게 처리
         add(linkTo(methodOn(IndexController.class).index()).withRel("index"));
     }
 }
