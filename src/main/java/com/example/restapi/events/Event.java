@@ -1,6 +1,5 @@
 package com.example.restapi.events;
 
-import com.example.restapi.accounts.Account;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,8 +22,8 @@ public class Event {
     private int maxPrice; // (optional)
     private int limitOfEnrollment; //등록한도
 
-    @ManyToOne
-    private Account manager;
+  //  @ManyToOne
+  //  private Account manager;
 
 
     // 기본값을 가지거나 계산이 필요한 컬럼들
