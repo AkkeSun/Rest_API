@@ -81,7 +81,7 @@ public class EventController {
      * Update API
      ***/
     @PutMapping("/{id}")
-    public ResponseEntity eventUpdate(@PathVariable Integer id, EventDto eventDto, Errors errors){
+    public ResponseEntity eventUpdate(@PathVariable Integer id, @RequestBody EventDto eventDto, Errors errors){
 
         Optional<Event> optional = eventRepository.findById(id);
         if(optional.isEmpty())

@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
 <body>
 <h1>index</h1>
 <a href="/api/test">TEST</a>
 </body>
+<script type="text/javascript">
+    $(function () {
+       let callback =  $.ajax({url: "/webclient/events/1"});
+       callback.done(s => alert(JSON.stringify(s)))
+    });
+</script>
+
 
 </html>
