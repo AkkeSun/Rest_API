@@ -1,32 +1,63 @@
 package com.example.restapi.api;
 
 import com.example.restapi.events.Event;
+import com.example.restapi.events.EventDto;
+import com.example.restapi.events.EventValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-@RestController
+@RestController // 이걸로 하지말자!!!!!
 @RequestMapping("/webclient")
 public class WebClientController {
 
-    // filter token 확인
     @Autowired
     WebClient webClient;
 
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    EventValidator validator;
+
     private String accessToken;
+
+
+    /**
+     * CREATE
+     */
+    @PostMapping("/events")
+    public Event createEvent(@RequestBody EventDto eventDto, Errors errors){
+
+        // 유효성 검사
+        validator.validate(eventDto, errors);
+        if(errors.hasErrors()){
+
+            errors.getAllErrors().forEach( e -> {
+                System.out.println("===Error code===");
+                System.out.println(e.getCode());
+                System.out.println(e.getDefaultMessage());
+            });
+            return null;
+
+        } else {
+            Event event = webClient
+                    .post()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+             //     .body(BodyInserters.fromFormData("data1", "aa").with("data2", "bb"))
+                    .body(Mono.just(eventDto), EventDto.class)
+                    .retrieve()
+                    .bodyToMono(Event.class)
+                    .block();
+            return event;
+        }
+    }
 
     /**
      * READ
@@ -52,28 +83,6 @@ public class WebClientController {
         return Map.of("objectList", objectList,"page", page);
     }
 
-
-    public List<Event> getObjectList(Map resultMap){
-
-        ArrayList<Event> returnList = new ArrayList<>();
-        LinkedHashMap lm = (LinkedHashMap) resultMap.get("_embedded");
-        ArrayList<Map> list = (ArrayList<Map>) lm.get("eventList");
-
-        for (int i = 0; i < list.size(); i++) {
-            Event e = modelMapper.map(list.get(i), Event.class); // ModelMapper 사용
-            returnList.add(e);
-        }
-        return returnList;
-    }
-
-
-    public PageDto getPage(Map resultMap){
-        LinkedHashMap lm = (LinkedHashMap) resultMap.get("page");
-        return modelMapper.map(lm, PageDto.class);
-    }
-
-
-
     @GetMapping("/events/{id}")
     public Event selectOne(@PathVariable String id) {
 
@@ -87,4 +96,59 @@ public class WebClientController {
         return event;
     }
 
+
+    /**
+     * UPDATE
+     */
+    @PutMapping("/events/{id}")
+    public Event upateEvent(@PathVariable String id, @RequestBody EventDto eventDto, Errors errors){
+
+        // 유효성 검사
+        validator.validate(eventDto, errors);
+        if(errors.hasErrors()){
+
+            errors.getAllErrors().forEach( e -> {
+                System.out.println("===Error code===");
+                System.out.println(e.getCode());
+                System.out.println(e.getDefaultMessage());
+            });
+            return null;
+
+        } else {
+            Event event = webClient
+                    .put()
+                    .uri("/{id}", id)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .body(Mono.just(eventDto), EventDto.class)
+                    .retrieve()
+                    .bodyToMono(Event.class)
+                    .block();
+            return event;
+        }
+    }
+
+
+
+
+
+
+    // Object List 구하기
+    public List<Event> getObjectList(Map resultMap){
+
+        ArrayList<Event> returnList = new ArrayList<>();
+        LinkedHashMap lm = (LinkedHashMap) resultMap.get("_embedded");
+        ArrayList<Map> list = (ArrayList<Map>) lm.get("eventList");
+
+        for (int i = 0; i < list.size(); i++) {
+            Event e = modelMapper.map(list.get(i), Event.class); // ModelMapper 사용
+            returnList.add(e);
+        }
+        return returnList;
+    }
+
+    // 페이징 정보
+    public PageDto getPage(Map resultMap){
+        LinkedHashMap lm = (LinkedHashMap) resultMap.get("page");
+        return modelMapper.map(lm, PageDto.class);
+    }
 }

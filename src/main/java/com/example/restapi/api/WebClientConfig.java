@@ -16,8 +16,4 @@ public class WebClientConfig {
                 .build();
     }
 
-    @Bean
-    public ModelMapper modelMapper(){
-        return new ModelMapper();
-    }
 }
