@@ -1,0 +1,7 @@
+
+[로그인 링크]
+
+http://localhost:9099/oauth/authorize
+?client_id=lowlow
+&redirect_uri=http://localhost:9099/oauth2/callback
+&response_type=code
